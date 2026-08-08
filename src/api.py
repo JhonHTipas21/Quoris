@@ -24,7 +24,7 @@ bm25_retriever: Optional[LocalBM25Retriever] = None
 vector_store: Optional[ChromaVectorStore] = None
 
 class QueryRequest(BaseModel):
-    query: str = Field(..., example="¿Cómo calculo la firma de integridad de Wompi?")
+    query: str = Field(..., examples=["¿Cómo calculo la firma de integridad de Wompi?"])
 
 class CitationSchema(BaseModel):
     id: str
