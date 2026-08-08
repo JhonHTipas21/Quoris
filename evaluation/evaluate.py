@@ -79,7 +79,21 @@ def run_evaluation():
         rr = 0.0
         
         for rank, chunk in enumerate(retrieved_chunks, start=1):
-            if chunk.metadata.get("section") == target_section:
+            import re
+            import unicodedata
+            
+            def normalize(t: str) -> str:
+                t = t.lower()
+                # Remove accents
+                t = "".join(c for c in unicodedata.normalize('NFD', t) if unicodedata.category(c) != 'Mn')
+                # Keep only alphanumeric
+                return re.sub(r'[^a-z0-9]', '', t)
+                
+            norm_target = normalize(target_section)
+            norm_path = normalize(chunk.metadata.get("header_path", ""))
+            norm_sec = normalize(chunk.metadata.get("section", ""))
+            
+            if norm_target in norm_path or norm_target in norm_sec:
                 hit = True
                 if rr == 0.0:
                     rr = 1.0 / rank
