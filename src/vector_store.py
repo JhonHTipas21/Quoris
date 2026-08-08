@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional
 from src.document import Document
 from src.interfaces import VectorStore, Embedder
 from src.config import DB_DIR
+from src.logger import get_logger
 
 class ChromaVectorStore(VectorStore):
     """
@@ -13,6 +14,7 @@ class ChromaVectorStore(VectorStore):
     """
     
     def __init__(self, embedder: Embedder, collection_name: str = "payment_docs"):
+        self.logger = get_logger(__name__)
         self.embedder = embedder
         # Setup persistent client
         self.client = chromadb.PersistentClient(path=str(DB_DIR))
@@ -40,6 +42,7 @@ class ChromaVectorStore(VectorStore):
         if not documents:
             return
 
+        self.logger.info(f"Checking {len(documents)} document chunks for updates in collection '{self.collection.name}'")
         ids_to_add: List[str] = []
         texts_to_add: List[str] = []
         metadatas_to_add: List[Dict[str, Any]] = []
@@ -78,6 +81,7 @@ class ChromaVectorStore(VectorStore):
             metadatas_to_add.append(meta)
 
         if ids_to_add:
+            self.logger.info(f"Upserting {len(ids_to_add)} new or modified document chunks to collection '{self.collection.name}'")
             # Generate embeddings for new/changed documents
             embeddings = self.embedder.embed_documents(texts_to_add)
             
@@ -88,8 +92,11 @@ class ChromaVectorStore(VectorStore):
                 documents=texts_to_add,
                 metadatas=metadatas_to_add
             )
+        else:
+            self.logger.info("All documents are already up-to-date in vector store. Skipping upsert.")
 
     def search(self, query_vector: List[float], k: int = 10, metadata_filter: Optional[Dict[str, Any]] = None) -> List[Document]:
+        self.logger.info(f"Querying vector database for top {k} neighbors (filter={metadata_filter})")
         # Format the filter for Chroma metadata query
         # Chroma format: where={"api_provider": "wompi"}
         where_clause = None
@@ -123,4 +130,5 @@ class ChromaVectorStore(VectorStore):
                 )
                 documents.append(doc)
                 
+        self.logger.info(f"Vector query returned {len(documents)} matching results")
         return documents
