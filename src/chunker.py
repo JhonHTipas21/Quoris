@@ -2,6 +2,7 @@ import re
 from typing import List
 from src.document import Document
 from src.interfaces import Chunker
+from src.logger import get_logger
 
 class SemanticCodeChunker(Chunker):
     """
@@ -12,6 +13,7 @@ class SemanticCodeChunker(Chunker):
     """
     
     def __init__(self, target_size: int = 600, overlap_size: int = 100):
+        self.logger = get_logger(__name__)
         self.target_size = target_size
         self.overlap_size = overlap_size
 
@@ -50,6 +52,7 @@ class SemanticCodeChunker(Chunker):
         return [b.strip() for b in blocks if b.strip()]
 
     def chunk(self, documents: List[Document]) -> List[Document]:
+        self.logger.info(f"Starting chunking process for {len(documents)} documents")
         chunks: List[Document] = []
 
         for doc in documents:
@@ -96,4 +99,5 @@ class SemanticCodeChunker(Chunker):
                 chunk_metadata["chunk_index"] = chunk_index
                 chunks.append(Document(page_content=chunk_text, metadata=chunk_metadata))
 
+        self.logger.info(f"Successfully generated {len(chunks)} chunks")
         return chunks
