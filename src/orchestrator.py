@@ -3,6 +3,8 @@ from typing import List, Dict, Any, Optional
 from src.document import Document
 from src.interfaces import Reranker, LLMGenerator
 from src.retriever import HybridRetriever
+from src.rewriter import GroqQueryRewriter
+from src.logger import get_logger
 
 class RAGOrchestrator:
     """
@@ -10,10 +12,12 @@ class RAGOrchestrator:
     Coordinates: Query Analysis -> Filtering -> Hybrid Search -> Reranking -> LLM Grounding -> Footnote Citations.
     """
     
-    def __init__(self, hybrid_retriever: HybridRetriever, reranker: Reranker, llm: LLMGenerator):
+    def __init__(self, hybrid_retriever: HybridRetriever, reranker: Reranker, llm: LLMGenerator, query_rewriter: Optional[GroqQueryRewriter] = None):
+        self.logger = get_logger(__name__)
         self.hybrid_retriever = hybrid_retriever
         self.reranker = reranker
         self.llm = llm
+        self.query_rewriter = query_rewriter
 
     def _detect_provider_filter(self, query: str) -> Optional[Dict[str, Any]]:
         """
@@ -31,29 +35,35 @@ class RAGOrchestrator:
     def _rewrite_query(self, query: str, provider_filter: Optional[Dict[str, Any]]) -> str:
         """
         Rewrites shorthand or vague user queries into search-optimized terms.
-        For a production-grade system, this could invoke a quick LLM call,
-        but a heuristic term expansion is faster and keeps latency low.
+        Applies LLM rewriter if available, combined with rule-based heuristics.
         """
+        # 1. Apply LLM query rewriting if enabled
+        if self.query_rewriter:
+            query = self.query_rewriter.rewrite(query)
+
         rewritten = query
-        # If the user asks about "firma" and we know they mean Wompi, expand it
+        # 2. Apply deterministic heuristics for key terminologies
         if provider_filter and provider_filter.get("api_provider") == "wompi":
             if "firma" in query.lower() or "signature" in query.lower():
-                rewritten += " firma de integridad sha256 concatenación secreto"
+                rewritten += " firma de integridad sha256 concatenacion secreto"
             if "webhook" in query.lower() or "evento" in query.lower():
-                rewritten += " webhook checksum validación de firma"
+                rewritten += " webhook checksum validacion de firma"
             if "aceptacion" in query.lower() or "acceptance" in query.lower():
                 rewritten += " token de aceptacion terminos y condiciones"
                 
         return rewritten
 
     def query(self, user_query: str) -> Dict[str, Any]:
+        self.logger.info(f"Received user query: '{user_query}'")
         start_time = time.time()
         
         # 1. Analyze and extract metadata filters (e.g. routing by api_provider)
         metadata_filter = self._detect_provider_filter(user_query)
+        self.logger.info(f"Metadata filter detected: {metadata_filter}")
         
         # 2. Query Rewriting (expand terminology)
         search_query = self._rewrite_query(user_query, metadata_filter)
+        self.logger.info(f"Search query re-written to: '{search_query}'")
         
         # 3. Hybrid Retrieval (Vector + BM25 combined via RRF)
         # Fetch top-10 candidates
@@ -62,6 +72,7 @@ class RAGOrchestrator:
             k=10, 
             metadata_filter=metadata_filter
         )
+        self.logger.info(f"Retrieved {len(candidates)} hybrid candidates from vector/lexical retrieval")
         
         # 4. Reranking (Cross-Encoder down to top-3)
         reranked_chunks = self.reranker.rerank(
@@ -69,6 +80,7 @@ class RAGOrchestrator:
             documents=candidates, 
             top_n=3
         )
+        self.logger.info(f"CrossEncoder reranking completed. Reduced candidates count to {len(reranked_chunks)}")
         
         # 5. LLM Grounded Generation & Citation Extraction
         response_data = self.llm.generate(
@@ -77,6 +89,7 @@ class RAGOrchestrator:
         )
         
         elapsed_time = time.time() - start_time
+        self.logger.info(f"Grounded response generated. Citations: {len(response_data['citations'])}. Total Latency: {elapsed_time:.3f}s")
         
         # 6. Build final response payload
         return {
