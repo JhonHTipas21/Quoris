@@ -59,7 +59,10 @@ class LocalBM25Retriever(KeywordRetriever):
             score = all_scores[original_idx]
             scored_docs.append((doc, score))
             
-        # 5. Sort documents by score descending
+        # 5. Filter out documents with score <= 0 (no keyword overlap)
+        scored_docs = [(doc, score) for doc, score in scored_docs if score > 0]
+            
+        # 6. Sort documents by score descending
         scored_docs.sort(key=lambda x: x[1], reverse=True)
         
         # Return top k
