@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 from pathlib import Path
 from src.document import Document
 from src.interfaces import DocumentLoader
+from src.logger import get_logger
 
 class MarkdownParser(DocumentLoader):
     """
@@ -11,6 +12,7 @@ class MarkdownParser(DocumentLoader):
     """
     
     def __init__(self, base_urls: Dict[str, str] = None):
+        self.logger = get_logger(__name__)
         # Map provider folders to their base URLs for source citing
         self.base_urls = base_urls or {
             "wompi": "https://docs.wompi.co",
@@ -21,7 +23,10 @@ class MarkdownParser(DocumentLoader):
     def load(self, file_path: str) -> List[Document]:
         path = Path(file_path)
         if not path.exists():
+            self.logger.error(f"Failed to load file, path does not exist: {file_path}")
             raise FileNotFoundError(f"File not found: {file_path}")
+
+        self.logger.info(f"Starting markdown parsing for file: {file_path}")
 
         # Determine metadata from file path
         api_provider = path.parent.name.lower()
