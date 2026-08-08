@@ -26,10 +26,15 @@ class ChromaVectorStore(VectorStore):
         """Generate a deterministic and unique ID for a chunk."""
         provider = doc.metadata.get("api_provider", "generic")
         source = doc.metadata.get("source_file", "unknown")
+        header_path = doc.metadata.get("header_path", "general")
         idx = doc.metadata.get("chunk_index", 0)
-        # Sanitize ID to avoid invalid characters in Chroma
-        sanitized_source = source.replace(".", "_").replace("/", "_")
-        return f"{provider}_{sanitized_source}_chunk_{idx}"
+        
+        # Sanitize to avoid invalid characters in Chroma
+        import re
+        sanitized_source = re.sub(r'[^a-zA-Z0-9_]', '_', source)
+        sanitized_path = re.sub(r'[^a-zA-Z0-9_]', '_', header_path.lower())
+        
+        return f"{provider}_{sanitized_source}_{sanitized_path}_chunk_{idx}"
 
     def add_documents(self, documents: List[Document]) -> None:
         if not documents:
