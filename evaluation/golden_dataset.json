@@ -1,0 +1,212 @@
+[
+  {
+    "id": "q1",
+    "query": "¿Cuáles son las URLs base para la API de Wompi en sandbox y producción?",
+    "expected_answer": "Para el entorno de Sandbox (pruebas) la URL base es https://sandbox.wompi.co/v1 y para el entorno de Producción la URL base es https://production.wompi.co/v1. Ambas requieren el protocolo HTTPS.",
+    "provider": "wompi",
+    "section": "Introducción y Autenticación"
+  },
+  {
+    "id": "q2",
+    "query": "¿Cuál es la diferencia de uso entre la llave pública y la llave privada en Wompi?",
+    "expected_answer": "La Llave Pública (pub_...) se usa para inicializar widgets, obtener tokens de aceptación y tokenizar métodos de pago (tarjeta o Nequi) en el cliente o servidor. La Llave Privada (prv_...) se usa en el servidor para crear transacciones directas, consultar estados y crear fuentes de pago.",
+    "provider": "wompi",
+    "section": "Introducción y Autenticación"
+  },
+  {
+    "id": "q3",
+    "query": "¿Cómo debo pasar mi Llave Privada en los headers para autenticarme en la API de Wompi?",
+    "expected_answer": "Debes pasar tu llave privada en la cabecera HTTP de autorización con el formato Bearer Token: 'Authorization: Bearer prv_test_xxxxxxxxxxxxxxxxxxxxxxxx'.",
+    "provider": "wompi",
+    "section": "Introducción y Autenticación"
+  },
+  {
+    "id": "q4",
+    "query": "¿Por qué es obligatorio el token de aceptación (Acceptance Token) en la API de Wompi?",
+    "expected_answer": "Es de carácter obligatorio para cumplir con la legislación colombiana (Ley 1581 de 2012 de Habeas Data y protección de datos), garantizando que el pagador acepte explícitamente los Términos y Condiciones y la Autorización de Tratamiento de Datos de Wompi.",
+    "provider": "wompi",
+    "section": "Tokens de Aceptación"
+  },
+  {
+    "id": "q5",
+    "query": "¿Qué endpoint y método HTTP debo usar para obtener el token de aceptación de Wompi?",
+    "expected_answer": "Se debe realizar una petición HTTP GET al endpoint de comercios con la llave pública en la URL: GET https://sandbox.wompi.co/v1/merchants/{merchant_public_key}.",
+    "provider": "wompi",
+    "section": "Tokens de Aceptación"
+  },
+  {
+    "id": "q6",
+    "query": "¿Qué campos contiene el objeto presigned_acceptance que retorna el endpoint de comercios?",
+    "expected_answer": "Contiene los campos 'acceptance_token' (el token de aceptación en sí) y 'permalink' (el enlace URL permanente a los Términos y Condiciones vigentes).",
+    "provider": "wompi",
+    "section": "Tokens de Aceptación"
+  },
+  {
+    "id": "q7",
+    "query": "¿Qué ocurre si no envío el token de aceptación al crear una transacción en Wompi?",
+    "expected_answer": "La API retornará un error de validación HTTP 422 Unprocessable Entity, indicando que el token de aceptación es obligatorio.",
+    "provider": "wompi",
+    "section": "Tokens de Aceptación"
+  },
+  {
+    "id": "q8",
+    "query": "¿Cómo se tokeniza una tarjeta de crédito en Wompi?",
+    "expected_answer": "Se envía una petición HTTP POST a https://sandbox.wompi.co/v1/tokens/cards incluyendo el número de tarjeta (number), código de seguridad (cvc), mes de expiración (exp_month), año de expiración (exp_year) y nombre del titular (card_holder), usando la llave pública en las cabeceras.",
+    "provider": "wompi",
+    "section": "Tokenización"
+  },
+  {
+    "id": "q9",
+    "query": "¿Cuál es el formato del ID del token de tarjeta que retorna Wompi al tokenizar?",
+    "expected_answer": "El ID del token retornado sigue el formato 'tok_test_card_...' para Sandbox o 'tok_prod_card_...' para producción.",
+    "provider": "wompi",
+    "section": "Tokenización"
+  },
+  {
+    "id": "q10",
+    "query": "¿Cómo se tokeniza una cuenta de Nequi en la API de Wompi?",
+    "expected_answer": "Se envía una petición HTTP POST a https://sandbox.wompi.co/v1/tokens/nequi pasando el cuerpo JSON 'phone_number' con el número telefónico del pagador.",
+    "provider": "wompi",
+    "section": "Tokenización"
+  },
+  {
+    "id": "q11",
+    "query": "¿Qué endpoint se utiliza para crear una transacción directa en Wompi?",
+    "expected_answer": "Se utiliza el endpoint HTTP POST https://sandbox.wompi.co/v1/transactions (o production en entorno productivo) autenticado con la llave privada.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q12",
+    "query": "¿Cómo se especifica un monto de 50.000 COP en la petición de creación de transacción de Wompi?",
+    "expected_answer": "El monto debe expresarse en centavos de la moneda local, por lo que 50.000 COP se envía como el entero 5000000 en el campo 'amount_in_cents'.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q13",
+    "query": "¿Cuáles son los campos obligatorios para el cuerpo JSON de una transacción de Wompi?",
+    "expected_answer": "Los campos base obligatorios son: acceptance_token, amount_in_cents, currency, signature, customer_email, reference, payment_method, y customer_data.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q14",
+    "query": "¿Cómo se estructura el objeto payment_method para un pago con tarjeta de crédito en Wompi?",
+    "expected_answer": "Se define como un objeto con 'type': 'CARD', 'token': '{token_de_tarjeta}' e 'installments': {número_de_cuotas}.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q15",
+    "query": "¿Cómo se estructura el objeto payment_method para un pago con Nequi?",
+    "expected_answer": "Se define como un objeto con 'type': 'NEQUI' y 'phone_number': '{número_de_celular_del_usuario}'. El usuario recibe una notificación push en su celular para confirmar.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q16",
+    "query": "¿Cuáles son los estados posibles de una transacción en la respuesta de Wompi?",
+    "expected_answer": "Los estados posibles son: PENDING (en procesamiento), APPROVED (exitosa), DECLINED (rechazada) y ERROR (fallo de procesamiento).",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q17",
+    "query": "¿Qué es la firma de integridad en Wompi y para qué sirve?",
+    "expected_answer": "Es un mecanismo de seguridad basado en un hash SHA256 que previene que los datos de una transacción (monto, referencia, moneda) sean alterados en tránsito desde el cliente antes de ser enviados.",
+    "provider": "wompi",
+    "section": "Firmas de Integridad"
+  },
+  {
+    "id": "q18",
+    "query": "¿Dónde se obtiene el secreto de integridad para firmar transacciones en Wompi?",
+    "expected_answer": "Se obtiene en el Dashboard del comercio en la sección Desarrolladores > Secretos para integración técnica > Secreto de integridad.",
+    "provider": "wompi",
+    "section": "Firmas de Integridad"
+  },
+  {
+    "id": "q19",
+    "query": "¿Cuál es el orden estricto de los campos para calcular la firma de integridad de transacciones?",
+    "expected_answer": "El orden de concatenación es: referencia + monto_en_centavos + moneda + secreto_de_integridad.",
+    "provider": "wompi",
+    "section": "Firmas de Integridad"
+  },
+  {
+    "id": "q20",
+    "query": "¿Qué algoritmo de hash y formato se usa para la firma de integridad de Wompi?",
+    "expected_answer": "Se utiliza el algoritmo SHA256, y el hash resultante debe expresarse en formato hexadecimal en letras minúsculas.",
+    "provider": "wompi",
+    "section": "Firmas de Integridad"
+  },
+  {
+    "id": "q21",
+    "query": "Escribe un ejemplo de cómo calcular la firma de integridad de Wompi en Python.",
+    "expected_answer": "import hashlib\ndef generar_firma(ref, monto, mon, sec):\n    cadena = f'{ref}{monto}{mon}{sec}'\n    return hashlib.sha256(cadena.encode('utf-8')).hexdigest()",
+    "provider": "wompi",
+    "section": "Firmas de Integridad"
+  },
+  {
+    "id": "q22",
+    "query": "¿Qué es un webhook en Wompi y cuándo se envía?",
+    "expected_answer": "Un webhook es una notificación HTTP POST enviada por Wompi a una URL preconfigurada en tu dashboard cuando una transacción cambia a un estado final (ej. APPROVED o DECLINED).",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q23",
+    "query": "¿Cómo viene estructurado el JSON del payload de un webhook de Wompi?",
+    "expected_answer": "Contiene las claves 'event' (ej. transaction.updated), 'data' (que contiene el objeto 'transaction' completo), 'sent_at' (timestamp ISO), 'environment' (test o prod) y 'signature' (con properties, timestamp y checksum).",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q24",
+    "query": "¿Cómo se calcula la firma (checksum) para validar la integridad de un webhook recibido?",
+    "expected_answer": "Se concatenan los valores de los campos especificados en signature.properties (en orden), seguidos del timestamp de la firma (signature.timestamp) y el Secreto de Integridad. Luego, se calcula el hash SHA256 de esa cadena concatenada y se compara con signature.checksum.",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q25",
+    "query": "¿Qué propiedades se usan típicamente en signature.properties de un webhook de transacciones?",
+    "expected_answer": "Típicamente se usan los valores de 'transaction.id', 'transaction.status' y 'transaction.amount_in_cents'.",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q26",
+    "query": "¿Cuál debe ser la respuesta de mi servidor al recibir un webhook de Wompi y cuál es el tiempo de timeout?",
+    "expected_answer": "Tu servidor debe retornar un código de estado HTTP 200 o 201 en menos de 10 segundos. De lo contrario, Wompi considerará que falló y reintentará la entrega.",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q27",
+    "query": "¿Cuántas veces reintenta Wompi el envío de un webhook si mi servidor no responde exitosamente?",
+    "expected_answer": "Wompi reintentará enviar la notificación del evento hasta 3 veces a lo largo de un período de 24 horas.",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q28",
+    "query": "Escribe una función de validación de webhook de Wompi en Python.",
+    "expected_answer": "def verificar_webhook(payload, secreto):\n    sig = payload['signature']\n    tx = payload['data']['transaction']\n    cadena = ''.join(str(tx[p.split('.')[1]]) for p in sig['properties'])\n    cadena += f\"{sig['timestamp']}{secreto}\"\n    return hashlib.sha256(cadena.encode('utf-8')).hexdigest() == sig['checksum']",
+    "provider": "wompi",
+    "section": "Webhooks y Notificación de Eventos"
+  },
+  {
+    "id": "q29",
+    "query": "¿Qué ocurre si una transacción de Nequi queda en estado PENDING?",
+    "expected_answer": "El estado PENDING significa que el cobro está esperando la aprobación del pagador a través de la notificación push en su aplicación móvil Nequi. Se debe esperar el webhook de confirmación.",
+    "provider": "wompi",
+    "section": "Creación de Transacciones"
+  },
+  {
+    "id": "q30",
+    "query": "¿Es posible tokenizar tarjetas o Nequi desde el backend (servidor)?",
+    "expected_answer": "Sí, es técnicamente posible utilizando la llave pública del comercio desde tu backend, aunque para tarjetas de crédito se recomienda hacerlo directamente desde el frontend para minimizar el alcance de la certificación PCI-DSS.",
+    "provider": "wompi",
+    "section": "Tokenización"
+  }
+]
