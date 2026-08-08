@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional
 from rank_bm25 import BM25Okapi
 from src.document import Document
 from src.interfaces import KeywordRetriever, VectorStore, Embedder
+from src.logger import get_logger
 
 class LocalBM25Retriever(KeywordRetriever):
     """
@@ -12,6 +13,7 @@ class LocalBM25Retriever(KeywordRetriever):
     """
     
     def __init__(self):
+        self.logger = get_logger(__name__)
         self.bm25: Optional[BM25Okapi] = None
         self.documents: List[Document] = []
 
@@ -21,6 +23,7 @@ class LocalBM25Retriever(KeywordRetriever):
 
     def index_documents(self, documents: List[Document]) -> None:
         self.documents = documents
+        self.logger.info(f"Indexing {len(documents)} documents for BM25 search")
         if not documents:
             self.bm25 = None
             return
@@ -75,11 +78,13 @@ class HybridRetriever:
     """
     
     def __init__(self, vector_store: VectorStore, embedder: Embedder, bm25_retriever: KeywordRetriever):
+        self.logger = get_logger(__name__)
         self.vector_store = vector_store
         self.embedder = embedder
         self.bm25_retriever = bm25_retriever
 
     def retrieve(self, query: str, k: int = 10, metadata_filter: Optional[Dict[str, Any]] = None, rrf_constant: int = 60) -> List[Document]:
+        self.logger.info(f"Initiating hybrid retrieval for query: '{query}' (filter={metadata_filter})")
         # 1. Dense retrieval (Vector Search)
         query_vector = self.embedder.embed_query(query)
         vector_results = self.vector_store.search(
