@@ -39,7 +39,7 @@ Quoris/
 │   ├── rewriter.py       # LLM-based query expansion and rewriting
 │   └── vector_store.py   # Chroma DB wrapper with incremental updates
 ├── tests/                # Comprehensive test suites for all modules
-├── evaluation/           # Evaluation pipeline and golden datasets (RAGAS metrics)
+├── evals/                # Evaluation pipeline, baseline metrics, and golden datasets
 ├── frontend/             # Streamlit interactive user interface
 └── requirements.txt      # Project dependencies
 ```
@@ -94,10 +94,22 @@ Execute the unit testing suite:
 pytest tests/ -v
 ```
 
-Execute the offline evaluation pipeline to compute Recall, MRR, and latency metrics against the golden dataset:
+Execute the offline evaluation pipeline to compute Recall, MRR, and baseline regression metrics against the golden dataset:
 ```bash
-python evaluation/evaluate.py
+# Run retrieval evaluation only (Phase 1)
+python evals/run_rag_eval.py --retrieval-only
+
+# Run full generation and RAGAS evaluation (Phase 2)
+python evals/run_rag_eval.py
 ```
 
 ## Continuous Integration
-The repository includes a GitHub Actions workflow (`.github/workflows/rag_ci.yml`) that automatically runs the test suite and evaluation pipeline on every Pull Request to ensure system integrity and performance consistency.
+The repository includes two GitHub Actions workflows:
+
+*   **PR Evaluation Workflow (`.github/workflows/rag-ci.yml`)**: Runs automatically on pull requests that modify source code, documentation, prompts, or evaluation datasets.
+    *   **Fork Security**: If a pull request originates from a fork, it executes in offline mode (Phase 1) to evaluate retrieval (Recall@3, MRR) without exposing API secrets.
+    *   **Internal PRs**: Executes the full pipeline, calculating retrieval and RAGAS generation metrics (context_recall, faithfulness, answer_relevancy, citation_validity), posting the final markdown summary as a PR comment.
+    *   **Chroma Cache**: Embeddings cache is managed dynamically based on document hashes.
+*   **Nightly Regression Workflow (`.github/workflows/rag-nightly.yml`)**: Runs nightly to benchmark the main branch against the baseline (`evals/baseline_metrics.json`).
+    *   If a quality metric drops by more than 5%, a GitHub issue is automatically created or commented on to notify the team of a RAG regression.
+    *   Threshold configurations default to: MIN_CONTEXT_RECALL=0.75, MIN_FAITHFULNESS=0.80, MIN_ANSWER_RELEVANCY=0.75, MIN_CITATION_VALIDITY=0.90.
