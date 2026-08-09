@@ -1,0 +1,67 @@
+name: RAG Nightly Evaluation
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 3 AM UTC
+  workflow_dispatch:
+
+env:
+  EMBEDDING_MODEL: "all-MiniLM-L6-v2"
+  MIN_CONTEXT_RECALL: "0.75"
+  MIN_FAITHFULNESS: "0.80"
+  MIN_ANSWER_RELEVANCY: "0.75"
+  MIN_CITATION_VALIDITY: "0.90"
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+jobs:
+  nightly-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Full Pipeline Evaluation
+        id: run_eval
+        run: |
+          # If it exits with 1 due to thresholds/regression, we catch it
+          python evals/run_rag_eval.py
+
+      - name: Archive Evaluation Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rag-evaluation-results
+          path: evals/results/
+          retention-days: 14
+
+      - name: Report Regression via Issue
+        if: failure() && steps.run_eval.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          TITLE="RAG Regression Detected: Nightly Eval $DATE"
+          
+          # Check for existing open issues with the same title to avoid duplicates
+          EXISTING=$(gh issue list --state open --search "$TITLE" --json number -q '.[0].number')
+          
+          if [ -z "$EXISTING" ]; then
+             echo "Creating new regression issue..."
+             gh issue create --title "$TITLE" \
+                             --body-file evals/eval_summary.md \
+                             --label "regression,rag-eval"
+          else
+             echo "Issue already exists: #$EXISTING. Adding comment..."
+             gh issue comment "$EXISTING" --body-file evals/eval_summary.md
+          fi

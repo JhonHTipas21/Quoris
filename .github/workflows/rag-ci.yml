@@ -1,0 +1,89 @@
+name: RAG Continuous Integration
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - 'evals/**'
+      - 'prompts/**'
+
+env:
+  EMBEDDING_MODEL: "all-MiniLM-L6-v2"
+  MIN_CONTEXT_RECALL: "0.75"
+  MIN_FAITHFULNESS: "0.80"
+  MIN_ANSWER_RELEVANCY: "0.75"
+  MIN_CITATION_VALIDITY: "0.90"
+
+jobs:
+  rag-evaluation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Cache ChromaDB Embeddings
+        id: cache-chroma
+        uses: actions/cache@v4
+        with:
+          path: chroma_db
+          key: chroma-db-${{ hashFiles('requirements.txt') }}-${{ env.EMBEDDING_MODEL }}-${{ hashFiles('docs/**/*.md') }}
+          restore-keys: |
+            chroma-db-${{ hashFiles('requirements.txt') }}-${{ env.EMBEDDING_MODEL }}-
+
+      - name: Check if PR is from Fork
+        id: fork_check
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "is_fork=true" >> $GITHUB_OUTPUT
+            echo "::notice::This PR is from a fork. Phase 2 (Generation Eval) will be skipped for security."
+          else
+            echo "is_fork=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Phase 1 (Retrieval Evaluation)
+        if: steps.fork_check.outputs.is_fork == 'true'
+        run: |
+          python evals/run_rag_eval.py --retrieval-only
+
+      - name: Run Full Pipeline (Phase 1 & 2)
+        if: steps.fork_check.outputs.is_fork == 'false'
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python evals/run_rag_eval.py
+
+      - name: Post Evaluation Summary to PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summaryContent = '';
+            try {
+              summaryContent = fs.readFileSync('evals/eval_summary.md', 'utf8');
+            } catch (err) {
+              summaryContent = '⚠️ The evaluation script failed or did not generate a summary. Check the logs.';
+            }
+
+            if ('${{ steps.fork_check.outputs.is_fork }}' === 'true') {
+               summaryContent = "> ℹ️ **Notice:** Phase 2 (LLM Generation) was skipped because this PR originates from a fork. Only offline retrieval metrics are shown.\n\n" + summaryContent;
+            }
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summaryContent
+            });
