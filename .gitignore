@@ -20,3 +20,8 @@ chroma_db/
 .vscode/
 .idea/
 .DS_Store
+
+# Evaluation and logs outputs
+evals/results/
+evals/eval_summary.md
+logs/
