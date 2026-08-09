@@ -74,11 +74,11 @@ jobs:
             try {
               summaryContent = fs.readFileSync('evals/eval_summary.md', 'utf8');
             } catch (err) {
-              summaryContent = '⚠️ The evaluation script failed or did not generate a summary. Check the logs.';
+              summaryContent = '[WARNING] The evaluation script failed or did not generate a summary. Check the logs.';
             }
 
             if ('${{ steps.fork_check.outputs.is_fork }}' === 'true') {
-               summaryContent = "> ℹ️ **Notice:** Phase 2 (LLM Generation) was skipped because this PR originates from a fork. Only offline retrieval metrics are shown.\n\n" + summaryContent;
+               summaryContent = "> **Notice:** Phase 2 (LLM Generation) was skipped because this PR originates from a fork. Only offline retrieval metrics are shown.\n\n" + summaryContent;
             }
 
             await github.rest.issues.createComment({
