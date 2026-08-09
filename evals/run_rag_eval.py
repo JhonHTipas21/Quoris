@@ -247,28 +247,28 @@ def run_evaluation(retrieval_only: bool):
     passed = passed_thresholds and not regression
     
     # Summary Table
-    summary = f"## 📊 RAG Evaluation Summary\n\n"
-    summary += f"**Status:** {'✅ PASSED' if passed else '❌ FAILED'}\n\n"
+    summary = f"## RAG Evaluation Summary\n\n"
+    summary += f"**Status:** {'PASSED' if passed else 'FAILED'}\n\n"
     summary += "| Metric | Score | Threshold | Status |\n"
     summary += "|---|---|---|---|\n"
-    summary += f"| Retrieval Recall@3 | {retrieval_recall:.3f} | - | {'✅' if not regression else '⚠️'} |\n"
-    summary += f"| Retrieval MRR | {retrieval_mrr:.3f} | - | {'✅' if not regression else '⚠️'} |\n"
+    summary += f"| Retrieval Recall@3 | {retrieval_recall:.3f} | - | {'OK' if not regression else 'WARNING'} |\n"
+    summary += f"| Retrieval MRR | {retrieval_mrr:.3f} | - | {'OK' if not regression else 'WARNING'} |\n"
     
     if run_phase_2:
-        summary += f"| Context Recall (RAGAS) | {avg_context_recall:.3f} | {min_context_recall} | {'✅' if avg_context_recall >= min_context_recall else '❌'} |\n"
-        summary += f"| Faithfulness (RAGAS) | {avg_faithfulness:.3f} | {min_faithfulness} | {'✅' if avg_faithfulness >= min_faithfulness else '❌'} |\n"
-        summary += f"| Answer Relevancy (RAGAS) | {avg_relevancy:.3f} | {min_relevancy} | {'✅' if avg_relevancy >= min_relevancy else '❌'} |\n"
-        summary += f"| Citation Validity | {avg_citation:.3f} | {min_citation} | {'✅' if avg_citation >= min_citation else '❌'} |\n"
-        summary += f"| Out-of-Corpus Safety | {ooc_score:.3f} | 1.0 | {'✅' if ooc_score == 1.0 else '❌'} |\n\n"
+        summary += f"| Context Recall (RAGAS) | {avg_context_recall:.3f} | {min_context_recall} | {'OK' if avg_context_recall >= min_context_recall else 'FAILED'} |\n"
+        summary += f"| Faithfulness (RAGAS) | {avg_faithfulness:.3f} | {min_faithfulness} | {'OK' if avg_faithfulness >= min_faithfulness else 'FAILED'} |\n"
+        summary += f"| Answer Relevancy (RAGAS) | {avg_relevancy:.3f} | {min_relevancy} | {'OK' if avg_relevancy >= min_relevancy else 'FAILED'} |\n"
+        summary += f"| Citation Validity | {avg_citation:.3f} | {min_citation} | {'OK' if avg_citation >= min_citation else 'FAILED'} |\n"
+        summary += f"| Out-of-Corpus Safety | {ooc_score:.3f} | 1.0 | {'OK' if ooc_score == 1.0 else 'FAILED'} |\n\n"
         
         metrics_df["avg_score"] = metrics_df[["context_recall", "faithfulness", "answer_relevancy"]].mean(axis=1)
         worst_row = metrics_df.loc[metrics_df["avg_score"].idxmin()]
         
-        summary += f"### 📉 Worst Performing Question (Avg Score: {worst_row['avg_score']:.2f})\n"
+        summary += f"### Worst Performing Question (Avg Score: {worst_row['avg_score']:.2f})\n"
         summary += f"- **Question:** {worst_row['question']}\n"
         summary += f"- **Answer:** {worst_row['answer']}\n"
     else:
-        summary += "\n> ℹ️ **Notice:** Phase 2 (LLM Generation) was skipped. Only offline retrieval metrics are shown.\n\n"
+        summary += "\n> Notice: Phase 2 (LLM Generation) was skipped. Only offline retrieval metrics are shown.\n\n"
 
     step_summary = os.getenv("GITHUB_STEP_SUMMARY")
     if step_summary:
