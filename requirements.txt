@@ -11,3 +11,4 @@ streamlit>=1.32.0
 pydantic>=2.6.4
 numpy>=1.22.4,<2.0.0
 pandas>=2.0.0
+langchain-groq>=0.1.0
