@@ -4,209 +4,588 @@
     "query": "¿Cuáles son las URLs base para la API de Wompi en sandbox y producción?",
     "expected_answer": "Para el entorno de Sandbox (pruebas) la URL base es https://sandbox.wompi.co/v1 y para el entorno de Producción la URL base es https://production.wompi.co/v1. Ambas requieren el protocolo HTTPS.",
     "provider": "wompi",
-    "section": "Introducción y Autenticación"
+    "section": "Introducción y Autenticación",
+    "expected_context_keywords": [
+      "sandbox",
+      "produccion",
+      "url base"
+    ]
   },
   {
     "id": "q2",
     "query": "¿Cuál es la diferencia de uso entre la llave pública y la llave privada en Wompi?",
     "expected_answer": "La Llave Pública (pub_...) se usa para inicializar widgets, obtener tokens de aceptación y tokenizar métodos de pago (tarjeta o Nequi) en el cliente o servidor. La Llave Privada (prv_...) se usa en el servidor para crear transacciones directas, consultar estados y crear fuentes de pago.",
     "provider": "wompi",
-    "section": "Introducción y Autenticación"
+    "section": "Introducción y Autenticación",
+    "expected_context_keywords": [
+      "llave publica",
+      "llave privada"
+    ]
   },
   {
     "id": "q3",
     "query": "¿Cómo debo pasar mi Llave Privada en los headers para autenticarme en la API de Wompi?",
     "expected_answer": "Debes pasar tu llave privada en la cabecera HTTP de autorización con el formato Bearer Token: 'Authorization: Bearer prv_test_xxxxxxxxxxxxxxxxxxxxxxxx'.",
     "provider": "wompi",
-    "section": "Introducción y Autenticación"
+    "section": "Introducción y Autenticación",
+    "expected_context_keywords": [
+      "llave privada",
+      "headers",
+      "bearer"
+    ]
   },
   {
     "id": "q4",
     "query": "¿Por qué es obligatorio el token de aceptación (Acceptance Token) en la API de Wompi?",
     "expected_answer": "Es de carácter obligatorio para cumplir con la legislación colombiana (Ley 1581 de 2012 de Habeas Data y protección de datos), garantizando que el pagador acepte explícitamente los Términos y Condiciones y la Autorización de Tratamiento de Datos de Wompi.",
     "provider": "wompi",
-    "section": "Tokens de Aceptación"
+    "section": "Tokens de Aceptación",
+    "expected_context_keywords": [
+      "token de aceptacion",
+      "ley 1581"
+    ]
   },
   {
     "id": "q5",
     "query": "¿Qué endpoint y método HTTP debo usar para obtener el token de aceptación de Wompi?",
     "expected_answer": "Se debe realizar una petición HTTP GET al endpoint de comercios con la llave pública en la URL: GET https://sandbox.wompi.co/v1/merchants/{merchant_public_key}.",
     "provider": "wompi",
-    "section": "Tokens de Aceptación"
+    "section": "Tokens de Aceptación",
+    "expected_context_keywords": [
+      "token de aceptacion",
+      "endpoint",
+      "comercios"
+    ]
   },
   {
     "id": "q6",
     "query": "¿Qué campos contiene el objeto presigned_acceptance que retorna el endpoint de comercios?",
     "expected_answer": "Contiene los campos 'acceptance_token' (el token de aceptación en sí) y 'permalink' (el enlace URL permanente a los Términos y Condiciones vigentes).",
     "provider": "wompi",
-    "section": "Tokens de Aceptación"
+    "section": "Tokens de Aceptación",
+    "expected_context_keywords": [
+      "presigned_acceptance",
+      "acceptance_token"
+    ]
   },
   {
     "id": "q7",
     "query": "¿Qué ocurre si no envío el token de aceptación al crear una transacción en Wompi?",
     "expected_answer": "La API retornará un error de validación HTTP 422 Unprocessable Entity, indicando que el token de aceptación es obligatorio.",
     "provider": "wompi",
-    "section": "Tokens de Aceptación"
+    "section": "Tokens de Aceptación",
+    "expected_context_keywords": [
+      "no envio el token",
+      "422"
+    ]
   },
   {
     "id": "q8",
     "query": "¿Cómo se tokeniza una tarjeta de crédito en Wompi?",
     "expected_answer": "Se envía una petición HTTP POST a https://sandbox.wompi.co/v1/tokens/cards incluyendo el número de tarjeta (number), código de seguridad (cvc), mes de expiración (exp_month), año de expiración (exp_year) y nombre del titular (card_holder), usando la llave pública en las cabeceras.",
     "provider": "wompi",
-    "section": "Tokenización"
+    "section": "Tokenización",
+    "expected_context_keywords": [
+      "tokeniza una tarjeta",
+      "number",
+      "cvc"
+    ]
   },
   {
     "id": "q9",
     "query": "¿Cuál es el formato del ID del token de tarjeta que retorna Wompi al tokenizar?",
     "expected_answer": "El ID del token retornado sigue el formato 'tok_test_card_...' para Sandbox o 'tok_prod_card_...' para producción.",
     "provider": "wompi",
-    "section": "Tokenización"
+    "section": "Tokenización",
+    "expected_context_keywords": [
+      "formato",
+      "tok_test_card"
+    ]
   },
   {
     "id": "q10",
     "query": "¿Cómo se tokeniza una cuenta de Nequi en la API de Wompi?",
     "expected_answer": "Se envía una petición HTTP POST a https://sandbox.wompi.co/v1/tokens/nequi pasando el cuerpo JSON 'phone_number' con el número telefónico del pagador.",
     "provider": "wompi",
-    "section": "Tokenización"
+    "section": "Tokenización",
+    "expected_context_keywords": [
+      "tokeniza una cuenta de nequi"
+    ]
   },
   {
     "id": "q11",
     "query": "¿Qué endpoint se utiliza para crear una transacción directa en Wompi?",
     "expected_answer": "Se utiliza el endpoint HTTP POST https://sandbox.wompi.co/v1/transactions (o production en entorno productivo) autenticado con la llave privada.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "endpoint",
+      "transaccion directa"
+    ]
   },
   {
     "id": "q12",
     "query": "¿Cómo se especifica un monto de 50.000 COP en la petición de creación de transacción de Wompi?",
     "expected_answer": "El monto debe expresarse en centavos de la moneda local, por lo que 50.000 COP se envía como el entero 5000000 en el campo 'amount_in_cents'.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "50.000 cop",
+      "amount_in_cents"
+    ]
   },
   {
     "id": "q13",
     "query": "¿Cuáles son los campos obligatorios para el cuerpo JSON de una transacción de Wompi?",
     "expected_answer": "Los campos base obligatorios son: acceptance_token, amount_in_cents, currency, signature, customer_email, reference, payment_method, y customer_data.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "campos obligatorios",
+      "cuerpo json"
+    ]
   },
   {
     "id": "q14",
     "query": "¿Cómo se estructura el objeto payment_method para un pago con tarjeta de crédito en Wompi?",
     "expected_answer": "Se define como un objeto con 'type': 'CARD', 'token': '{token_de_tarjeta}' e 'installments': {número_de_cuotas}.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "payment_method",
+      "tarjeta de credito"
+    ]
   },
   {
     "id": "q15",
     "query": "¿Cómo se estructura el objeto payment_method para un pago con Nequi?",
     "expected_answer": "Se define como un objeto con 'type': 'NEQUI' y 'phone_number': '{número_de_celular_del_usuario}'. El usuario recibe una notificación push en su celular para confirmar.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "payment_method",
+      "nequi"
+    ]
   },
   {
     "id": "q16",
     "query": "¿Cuáles son los estados posibles de una transacción en la respuesta de Wompi?",
     "expected_answer": "Los estados posibles son: PENDING (en procesamiento), APPROVED (exitosa), DECLINED (rechazada) y ERROR (fallo de procesamiento).",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "estados posibles",
+      "transaccion"
+    ]
   },
   {
     "id": "q17",
     "query": "¿Qué es la firma de integridad en Wompi y para qué sirve?",
     "expected_answer": "Es un mecanismo de seguridad basado en un hash SHA256 que previene que los datos de una transacción (monto, referencia, moneda) sean alterados en tránsito desde el cliente antes de ser enviados.",
     "provider": "wompi",
-    "section": "Firmas de Integridad"
+    "section": "Firmas de Integridad",
+    "expected_context_keywords": [
+      "firma de integridad",
+      "sha256"
+    ]
   },
   {
     "id": "q18",
     "query": "¿Dónde se obtiene el secreto de integridad para firmar transacciones en Wompi?",
     "expected_answer": "Se obtiene en el Dashboard del comercio en la sección Desarrolladores > Secretos para integración técnica > Secreto de integridad.",
     "provider": "wompi",
-    "section": "Firmas de Integridad"
+    "section": "Firmas de Integridad",
+    "expected_context_keywords": [
+      "secreto de integridad",
+      "dashboard"
+    ]
   },
   {
     "id": "q19",
     "query": "¿Cuál es el orden estricto de los campos para calcular la firma de integridad de transacciones?",
     "expected_answer": "El orden de concatenación es: referencia + monto_en_centavos + moneda + secreto_de_integridad.",
     "provider": "wompi",
-    "section": "Firmas de Integridad"
+    "section": "Firmas de Integridad",
+    "expected_context_keywords": [
+      "orden estricto",
+      "firma"
+    ]
   },
   {
     "id": "q20",
     "query": "¿Qué algoritmo de hash y formato se usa para la firma de integridad de Wompi?",
     "expected_answer": "Se utiliza el algoritmo SHA256, y el hash resultante debe expresarse en formato hexadecimal en letras minúsculas.",
     "provider": "wompi",
-    "section": "Firmas de Integridad"
+    "section": "Firmas de Integridad",
+    "expected_context_keywords": [
+      "algoritmo",
+      "formato hexadecimal"
+    ]
   },
   {
     "id": "q21",
     "query": "Escribe un ejemplo de cómo calcular la firma de integridad de Wompi en Python.",
     "expected_answer": "import hashlib\ndef generar_firma(ref, monto, mon, sec):\n    cadena = f'{ref}{monto}{mon}{sec}'\n    return hashlib.sha256(cadena.encode('utf-8')).hexdigest()",
     "provider": "wompi",
-    "section": "Firmas de Integridad"
+    "section": "Firmas de Integridad",
+    "expected_context_keywords": [
+      "calcular la firma",
+      "python"
+    ]
   },
   {
     "id": "q22",
     "query": "¿Qué es un webhook en Wompi y cuándo se envía?",
     "expected_answer": "Un webhook es una notificación HTTP POST enviada por Wompi a una URL preconfigurada en tu dashboard cuando una transacción cambia a un estado final (ej. APPROVED o DECLINED).",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "webhook",
+      "notificacion"
+    ]
   },
   {
     "id": "q23",
     "query": "¿Cómo viene estructurado el JSON del payload de un webhook de Wompi?",
     "expected_answer": "Contiene las claves 'event' (ej. transaction.updated), 'data' (que contiene el objeto 'transaction' completo), 'sent_at' (timestamp ISO), 'environment' (test o prod) y 'signature' (con properties, timestamp y checksum).",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "json",
+      "payload",
+      "webhook"
+    ]
   },
   {
     "id": "q24",
     "query": "¿Cómo se calcula la firma (checksum) para validar la integridad de un webhook recibido?",
     "expected_answer": "Se concatenan los valores de los campos especificados en signature.properties (en orden), seguidos del timestamp de la firma (signature.timestamp) y el Secreto de Integridad. Luego, se calcula el hash SHA256 de esa cadena concatenada y se compara con signature.checksum.",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "firma",
+      "checksum",
+      "webhook"
+    ]
   },
   {
     "id": "q25",
     "query": "¿Qué propiedades se usan típicamente en signature.properties de un webhook de transacciones?",
     "expected_answer": "Típicamente se usan los valores de 'transaction.id', 'transaction.status' y 'transaction.amount_in_cents'.",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "signature.properties"
+    ]
   },
   {
     "id": "q26",
     "query": "¿Cuál debe ser la respuesta de mi servidor al recibir un webhook de Wompi y cuál es el tiempo de timeout?",
     "expected_answer": "Tu servidor debe retornar un código de estado HTTP 200 o 201 en menos de 10 segundos. De lo contrario, Wompi considerará que falló y reintentará la entrega.",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "respuesta de mi servidor",
+      "200"
+    ]
   },
   {
     "id": "q27",
     "query": "¿Cuántas veces reintenta Wompi el envío de un webhook si mi servidor no responde exitosamente?",
     "expected_answer": "Wompi reintentará enviar la notificación del evento hasta 3 veces a lo largo de un período de 24 horas.",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "reintenta",
+      "veces"
+    ]
   },
   {
     "id": "q28",
     "query": "Escribe una función de validación de webhook de Wompi en Python.",
     "expected_answer": "def verificar_webhook(payload, secreto):\n    sig = payload['signature']\n    tx = payload['data']['transaction']\n    cadena = ''.join(str(tx[p.split('.')[1]]) for p in sig['properties'])\n    cadena += f\"{sig['timestamp']}{secreto}\"\n    return hashlib.sha256(cadena.encode('utf-8')).hexdigest() == sig['checksum']",
     "provider": "wompi",
-    "section": "Webhooks y Notificación de Eventos"
+    "section": "Webhooks y Notificación de Eventos",
+    "expected_context_keywords": [
+      "verificacion",
+      "python",
+      "webhook"
+    ]
   },
   {
     "id": "q29",
     "query": "¿Qué ocurre si una transacción de Nequi queda en estado PENDING?",
     "expected_answer": "El estado PENDING significa que el cobro está esperando la aprobación del pagador a través de la notificación push en su aplicación móvil Nequi. Se debe esperar el webhook de confirmación.",
     "provider": "wompi",
-    "section": "Creación de Transacciones"
+    "section": "Creación de Transacciones",
+    "expected_context_keywords": [
+      "nequi",
+      "pending"
+    ]
   },
   {
     "id": "q30",
     "query": "¿Es posible tokenizar tarjetas o Nequi desde el backend (servidor)?",
     "expected_answer": "Sí, es técnicamente posible utilizando la llave pública del comercio desde tu backend, aunque para tarjetas de crédito se recomienda hacerlo directamente desde el frontend para minimizar el alcance de la certificación PCI-DSS.",
     "provider": "wompi",
-    "section": "Tokenización"
+    "section": "Tokenización",
+    "expected_context_keywords": [
+      "tokenizar",
+      "backend"
+    ]
+  },
+  {
+    "id": "s1",
+    "query": "¿Cual es la diferencia entre PaymentIntent y PaymentMethod en Stripe?",
+    "expected_answer": "Un PaymentIntent representa la intención de cobrar, haciendo seguimiento a todo el ciclo de vida del pago. Un PaymentMethod es el método de pago tokenizado (tarjeta, billetera) que se adjunta al PaymentIntent.",
+    "provider": "stripe",
+    "section": "PaymentIntents",
+    "expected_context_keywords": [
+      "paymentintent",
+      "paymentmethod"
+    ]
+  },
+  {
+    "id": "s2",
+    "query": "¿Como confirmo un PaymentIntent en Stripe?",
+    "expected_answer": "Debes llamar a la API de confirmación pasando el payment_method, o configurar automatic_payment_methods=true.",
+    "provider": "stripe",
+    "section": "PaymentIntents",
+    "expected_context_keywords": [
+      "confirmar",
+      "paymentintent"
+    ]
+  },
+  {
+    "id": "s3",
+    "query": "¿Que estados tiene un PaymentIntent?",
+    "expected_answer": "Los estados principales son: requires_payment_method, requires_confirmation, requires_action, processing, succeeded, y canceled.",
+    "provider": "stripe",
+    "section": "PaymentIntents",
+    "expected_context_keywords": [
+      "estados",
+      "succeeded"
+    ]
+  },
+  {
+    "id": "s4",
+    "query": "¿Para que sirve la idempotency key en Stripe?",
+    "expected_answer": "Evita que un mismo pago se cobre dos veces si hay un problema de red. Se envía en el header 'Idempotency-Key'.",
+    "provider": "stripe",
+    "section": "Errores y Reintentos",
+    "expected_context_keywords": [
+      "idempotency-key"
+    ]
+  },
+  {
+    "id": "s5",
+    "query": "¿Como verifico la firma de un webhook en Stripe?",
+    "expected_answer": "Stripe incluye la firma en el header 'Stripe-Signature'. Debes verificar el timestamp, calcular el HMAC SHA-256 usando tu webhook secret y el payload crudo, y compararlo con el valor recibido.",
+    "provider": "stripe",
+    "section": "Webhooks",
+    "expected_context_keywords": [
+      "stripe-signature",
+      "hmac"
+    ]
+  },
+  {
+    "id": "s6",
+    "query": "¿Que es un webhook secret en Stripe?",
+    "expected_answer": "Es una clave secreta que se usa para verificar criptográficamente que los eventos enviados a tu endpoint de webhooks provienen efectivamente de Stripe.",
+    "provider": "stripe",
+    "section": "Webhooks",
+    "expected_context_keywords": [
+      "webhook secret"
+    ]
+  },
+  {
+    "id": "s7",
+    "query": "¿Cual es la URL de la API de Stripe?",
+    "expected_answer": "La URL base de la API de Stripe es https://api.stripe.com/.",
+    "provider": "stripe",
+    "section": "Introduccion",
+    "expected_context_keywords": [
+      "api.stripe.com"
+    ]
+  },
+  {
+    "id": "s8",
+    "query": "¿Como me autentico con la API de Stripe?",
+    "expected_answer": "Mediante Basic Auth enviando tu Secret Key como el username, sin contraseña, o usando el header 'Authorization: Bearer sk_test_...'.",
+    "provider": "stripe",
+    "section": "Autenticacion",
+    "expected_context_keywords": [
+      "secret key",
+      "bearer"
+    ]
+  },
+  {
+    "id": "s9",
+    "query": "¿Como tokenizo una tarjeta en Stripe?",
+    "expected_answer": "Usando Stripe.js en el frontend para llamar a stripe.createPaymentMethod() y enviar la tarjeta de forma segura sin que toque tus servidores.",
+    "provider": "stripe",
+    "section": "Tokenizacion",
+    "expected_context_keywords": [
+      "createpaymentmethod",
+      "stripe.js"
+    ]
+  },
+  {
+    "id": "s10",
+    "query": "¿Que pasa si el cliente requiere 3D Secure en Stripe?",
+    "expected_answer": "El PaymentIntent pasará al estado 'requires_action' y deberás manejar la redirección de autenticación en el frontend.",
+    "provider": "stripe",
+    "section": "PaymentIntents",
+    "expected_context_keywords": [
+      "3d secure",
+      "requires_action"
+    ]
+  },
+  {
+    "id": "mp1",
+    "query": "¿Como genero un card_token en MercadoPago?",
+    "expected_answer": "Debes usar MercadoPago.js en el frontend para capturar los datos y enviarlos a la API de tokenización, obteniendo un 'card_token_id'.",
+    "provider": "mercadopago",
+    "section": "Tokens",
+    "expected_context_keywords": [
+      "card_token",
+      "mercadopago.js"
+    ]
+  },
+  {
+    "id": "mp2",
+    "query": "¿Cual es el endpoint para crear pagos en MercadoPago?",
+    "expected_answer": "El endpoint es POST https://api.mercadopago.com/v1/payments.",
+    "provider": "mercadopago",
+    "section": "Pagos",
+    "expected_context_keywords": [
+      "/v1/payments"
+    ]
+  },
+  {
+    "id": "mp3",
+    "query": "¿Que parametros son obligatorios al crear un pago con tarjeta en MercadoPago?",
+    "expected_answer": "transaction_amount, token (card_token), description, installments, payment_method_id, y los datos del payer (email).",
+    "provider": "mercadopago",
+    "section": "Pagos",
+    "expected_context_keywords": [
+      "transaction_amount",
+      "installments"
+    ]
+  },
+  {
+    "id": "mp4",
+    "query": "¿Como valida MercadoPago los webhooks?",
+    "expected_answer": "MercadoPago envía una firma en el header 'x-signature' que consiste en un hash HMAC-SHA256 usando el timestamp, el id del evento y tu clave secreta.",
+    "provider": "mercadopago",
+    "section": "Webhooks",
+    "expected_context_keywords": [
+      "x-signature",
+      "hmac"
+    ]
+  },
+  {
+    "id": "mp5",
+    "query": "¿Que contiene el payload de un webhook de MercadoPago?",
+    "expected_answer": "Contiene 'action', 'api_version', 'data' (con el id del recurso), 'date_created', 'id', 'live_mode', 'type' y 'user_id'.",
+    "provider": "mercadopago",
+    "section": "Webhooks",
+    "expected_context_keywords": [
+      "action",
+      "data"
+    ]
+  },
+  {
+    "id": "mp6",
+    "query": "¿Como autentico mis requests a MercadoPago?",
+    "expected_answer": "Añadiendo tu Access Token en el header 'Authorization: Bearer YOUR_ACCESS_TOKEN'.",
+    "provider": "mercadopago",
+    "section": "Autenticacion",
+    "expected_context_keywords": [
+      "access token"
+    ]
+  },
+  {
+    "id": "mp7",
+    "query": "¿Que son las credenciales de prueba de MercadoPago?",
+    "expected_answer": "Son Access Tokens y Public Keys designados como TEST para probar la integración en sandbox.",
+    "provider": "mercadopago",
+    "section": "Autenticacion",
+    "expected_context_keywords": [
+      "test"
+    ]
+  },
+  {
+    "id": "mp8",
+    "query": "¿Que es un payment_method_id en MercadoPago?",
+    "expected_answer": "Es el identificador de la red de la tarjeta, por ejemplo 'visa', 'master', o el identificador del medio de pago en efectivo (ej. 'efecty').",
+    "provider": "mercadopago",
+    "section": "Pagos",
+    "expected_context_keywords": [
+      "visa",
+      "master"
+    ]
+  },
+  {
+    "id": "mp9",
+    "query": "¿Que significa el estado 'in_process' en un pago de MercadoPago?",
+    "expected_answer": "Significa que el pago está siendo analizado por el motor antifraude o está pendiente de confirmación.",
+    "provider": "mercadopago",
+    "section": "Pagos",
+    "expected_context_keywords": [
+      "in_process",
+      "antifraude"
+    ]
+  },
+  {
+    "id": "mp10",
+    "query": "¿Como se manejan los reembolsos en MercadoPago?",
+    "expected_answer": "Debes realizar un request a la API de devoluciones apuntando al id del pago aprobado.",
+    "provider": "mercadopago",
+    "section": "Pagos",
+    "expected_context_keywords": [
+      "reembolsos",
+      "devoluciones"
+    ]
+  },
+  {
+    "id": "ooc1",
+    "query": "¿Que tarifa o comision por transaccion cobra Wompi?",
+    "expected_answer": "No tengo información suficiente para responder a tu pregunta.",
+    "provider": "wompi",
+    "section": "N/A",
+    "expected_context_keywords": []
+  },
+  {
+    "id": "ooc2",
+    "query": "¿Cual es el SLA de soporte tecnico de Stripe?",
+    "expected_answer": "No tengo información suficiente para responder a tu pregunta.",
+    "provider": "stripe",
+    "section": "N/A",
+    "expected_context_keywords": []
+  },
+  {
+    "id": "ooc3",
+    "query": "¿Puedo procesar pagos con criptomonedas usando MercadoPago?",
+    "expected_answer": "No tengo información suficiente para responder a tu pregunta.",
+    "provider": "mercadopago",
+    "section": "N/A",
+    "expected_context_keywords": []
+  },
+  {
+    "id": "ooc4",
+    "query": "¿Como integro PayPal con Wompi?",
+    "expected_answer": "No tengo información suficiente para responder a tu pregunta.",
+    "provider": "wompi",
+    "section": "N/A",
+    "expected_context_keywords": []
+  },
+  {
+    "id": "ooc5",
+    "query": "¿Como se instala la libreria de React de MercadoPago?",
+    "expected_answer": "No tengo información suficiente para responder a tu pregunta.",
+    "provider": "mercadopago",
+    "section": "N/A",
+    "expected_context_keywords": []
   }
 ]
