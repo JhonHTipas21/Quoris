@@ -65,8 +65,7 @@ jobs:
           if [ -z "$EXISTING" ]; then
              echo "Creating new regression issue..."
              gh issue create --title "$TITLE" \
-                             --body-file "$BODY_FILE" \
-                             --label "regression,rag-eval"
+                             --body-file "$BODY_FILE"
           else
              echo "Issue already exists: #$EXISTING. Adding comment..."
              gh issue comment "$EXISTING" --body-file "$BODY_FILE"
