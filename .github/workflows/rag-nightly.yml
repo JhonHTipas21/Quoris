@@ -56,12 +56,18 @@ jobs:
           # Check for existing open issues with the same title to avoid duplicates
           EXISTING=$(gh issue list --state open --search "$TITLE" --json number -q '.[0].number')
           
+          BODY_FILE="evals/eval_summary.md"
+          if [ ! -f "$BODY_FILE" ]; then
+             echo "Evaluation summary not found. The script might have crashed before generating the report. Check the action logs." > evals/error_summary.md
+             BODY_FILE="evals/error_summary.md"
+          fi
+          
           if [ -z "$EXISTING" ]; then
              echo "Creating new regression issue..."
              gh issue create --title "$TITLE" \
-                             --body-file evals/eval_summary.md \
+                             --body-file "$BODY_FILE" \
                              --label "regression,rag-eval"
           else
              echo "Issue already exists: #$EXISTING. Adding comment..."
-             gh issue comment "$EXISTING" --body-file evals/eval_summary.md
+             gh issue comment "$EXISTING" --body-file "$BODY_FILE"
           fi
